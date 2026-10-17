@@ -1,0 +1,12 @@
+.stApp { background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%); }
+h1, h2, h3 { color: #1e293b !important; font-weight: 700 !important; }
+[data-testid="stMetricValue"] { color: #2E86AB !important; font-weight: 800; }
+[data-testid="stMetricLabel"] { color: #64748b !important; font-weight: 600; }
+[data-testid="stSidebar"] { background: #1e293b; }
+[data-testid="stSidebar"] * { color: #f1f5f9 !important; }
+.insight-card { padding: 14px 18px; border-radius: 12px; margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 15px; line-height: 1.5; }
+.insight-success { background: #dcfce7; border-left: 5px solid #06A77D; }
+.insight-danger  { background: #fee2e2; border-left: 5px solid #D62828; }
+.insight-warning { background: #fef3c7; border-left: 5px solid #F18F01; }
+.insight-info    { background: #dbeafe; border-left: 5px solid #2E86AB; }
