@@ -52,11 +52,10 @@ div[data-baseweb="select"] *,div[data-baseweb="input"] *,[data-testid="stDateInp
 div[data-baseweb="select"] svg,div[data-baseweb="input"] svg{fill:var(--ftx)!important}
 input::placeholder{color:var(--fph)!important;opacity:1;-webkit-text-fill-color:var(--fph)!important}
 span[data-baseweb="tag"]{background:var(--ftag)!important}
-[data-testid="stDateInput"] div[data-baseweb="input"]{background-color:var(--fbg)!important;border:1.5px solid var(--bd)!important;border-radius:10px!important}
-[data-testid="stDateInput"] div[data-baseweb="input"] div{background-color:transparent!important}
-[data-testid="stDateInput"] div[data-baseweb="input"] *{color:var(--ftx)!important;-webkit-text-fill-color:var(--ftx)!important;caret-color:var(--ftx)}
-[data-testid="stDateInput"] input{background:transparent!important;font-weight:600}
-[data-testid="stDateInput"] svg{fill:var(--ftx)!important}
+[data-testid="stDateInputField"]{background-color:var(--fbg)!important;border:1.5px solid var(--bd)!important;border-radius:10px!important}
+[data-testid="stDateInputField"] *{color:var(--ftx)!important;-webkit-text-fill-color:var(--ftx)!important;caret-color:var(--ftx);background-color:transparent;font-weight:600}
+[data-testid="stDateInputField"] [data-type]:focus{background-color:var(--ftag)!important;border-radius:4px}
+[data-testid="stDateInputField"] svg,[data-testid="stDateInputCalendarButton"] svg{fill:var(--ftx)!important}
 span[data-baseweb="tag"],span[data-baseweb="tag"] *{color:#fff!important;-webkit-text-fill-color:#fff!important}
 span[data-baseweb="tag"] svg{fill:#fff!important}
 div[data-baseweb="popover"],div[data-baseweb="popover"]>div,ul[role="listbox"],
