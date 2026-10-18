@@ -1,16 +1,29 @@
 import streamlit as st
+import plotly.express as px
 from src.data_loader import load_raw_data
 from src.preprocessing import clean_and_enrich, apply_filters
-from src.analytics import kpis, monthly_trend, sales_by_category, segment_breakdown
-from src.visualizations import line_trend, pie_chart, bar_chart
+from src.analytics import kpis, monthly_trend, sales_by_category, segment_breakdown, weekday_pattern
 from src.insights import generate_insights
-from src.ui import render_kpis, apply_chart_theme, inject_custom_css
-import plotly.express as px
+from src.ui import inject_custom_css, render_hero, render_kpis, apply_chart_theme
 
 st.set_page_config(page_title="Overview", page_icon="📊", layout="wide")
 
-# Ensure theme is loaded
-theme = st.session_state.get("theme", "dark")
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+# --- TOP BAR & THEME ---
+colT1, colT2 = st.columns([8, 2])
+with colT1:
+    st.markdown("<h3 style='margin:0; padding-top:5px;'>📊 Executive Overview</h3>", unsafe_allow_html=True)
+with colT2:
+    theme_choice = st.radio("Theme", ["🌙 Dark", "☀️ Light"], index=0 if st.session_state.theme=="dark" else 1, horizontal=True, label_visibility="collapsed")
+    new_theme = "dark" if "Dark" in theme_choice else "light"
+    if new_theme != st.session_state.theme:
+        st.session_state.theme = new_theme
+        st.rerun()
+
+theme = st.session_state.theme
+inject_custom_css(theme)
 
 @st.cache_data
 def _load():
@@ -18,61 +31,66 @@ def _load():
 
 df = _load()
 
-# --- SIDEBAR FILTERS ---
-with st.sidebar:
-    st.header("🔎 Dashboard Filters")
-    years = st.multiselect("Year", sorted(df["Order Year"].unique()))
-    regions = st.multiselect("Region", sorted(df["Region"].unique()))
-    cats = st.multiselect("Category", sorted(df["Category"].unique()))
-    segs = st.multiselect("Segment", sorted(df["Segment"].unique()))
+# --- FULL WIDTH TOP FILTERS (No Sidebar) ---
+with st.container():
+    f1, f2, f3, f4 = st.columns(4)
+    with f1:
+        years = st.multiselect("📅 Select Year", sorted(df["Order Year"].unique()), placeholder="All Years")
+    with f2:
+        regions = st.multiselect("🌍 Region", sorted(df["Region"].unique()), placeholder="All Regions")
+    with f3:
+        cats = st.multiselect("🛍️ Category", sorted(df["Category"].unique()), placeholder="All Categories")
+    with f4:
+        segs = st.multiselect("👥 Segment", sorted(df["Segment"].unique()), placeholder="All Segments")
 
 filtered = apply_filters(df, years=years, regions=regions, categories=cats, segments=segs)
-
-# --- HEADER ---
-st.title("📊 Executive Overview")
-st.markdown("Comprehensive view of sales performance and profitability.")
-
-# --- KPI CARDS ---
 k = kpis(filtered)
-render_kpis(k)
 
-st.divider()
+# --- HERO BAR ---
+render_hero("Overview", "Real-time analysis of revenue, profit, and segments", 
+            [f"📉 {k['orders']:,} Orders", f"👥 {k['customers']:,} Customers", f"💸 {k['avg_discount']:.1f}% Avg Disc"])
 
-# --- CHARTS ROW 1 ---
-col1, col2 = st.columns([2, 1])
+# --- CUSTOM KPI CARDS ---
+render_kpis([
+    ("Total Sales", f"${k['total_sales']:,.0f}", "Gross Revenue", "#38bdf8", "💵"),
+    ("Total Profit", f"${k['total_profit']:,.0f}", f"Margin: {k['avg_profit_margin']:.1f}%", "#10b981", "📈"),
+    ("Orders", f"{k['orders']:,}", f"AOV: ${k['avg_order_value']:,.0f}", "#a855f7", "📦"),
+    ("Loss Orders", f"{k['loss_making_orders']:,}", "Needs attention", "#ef4444", "🚨")
+])
 
-with col1:
-    st.subheader("📈 Revenue Trend")
+st.markdown("<br>", unsafe_allow_html=True)
+
+# --- ROW 1: CHARTS ---
+c1, c2, c3 = st.columns([2, 1, 1])
+
+with c1:
     trend = monthly_trend(filtered)
-    fig_trend = px.area(trend, x="Order Year-Month", y="Sales", 
-                        color_discrete_sequence=["#38BDF8"])
-    fig_trend.update_traces(fill='tozeroy', line=dict(width=2))
-    fig_trend = apply_chart_theme(fig_trend, theme)
-    st.plotly_chart(fig_trend, use_container_width=True)
+    fig1 = px.area(trend, x="Order Year-Month", y="Sales", title="📈 Monthly Sales Trend")
+    fig1.update_traces(fill='tozeroy', line_color='#38bdf8')
+    st.plotly_chart(apply_chart_theme(fig1, theme), use_container_width=True)
 
-with col2:
-    st.subheader("🍩 Sales Mix")
+with c2:
     cat_data = sales_by_category(filtered)
-    fig_pie = px.pie(cat_data, names="Category", values="Sales", hole=0.7)
-    fig_pie.update_layout(showlegend=False)
-    fig_pie.add_annotation(text=f"<b>${k['total_sales']/1000:.0f}K</b><br>Total", showarrow=False, font=dict(size=16))
-    fig_pie = apply_chart_theme(fig_pie, theme)
-    st.plotly_chart(fig_pie, use_container_width=True)
+    fig2 = px.pie(cat_data, names="Category", values="Sales", title="🍩 Category Share", hole=0.6)
+    st.plotly_chart(apply_chart_theme(fig2, theme), use_container_width=True)
 
-# --- CHARTS ROW 2 ---
-col3, col4 = st.columns(2)
+with c3:
+    wd = weekday_pattern(filtered)
+    fig3 = px.bar(wd, x="Order Weekday", y="Orders", title="📆 Weekday Orders")
+    fig3.update_traces(marker_color='#a855f7')
+    st.plotly_chart(apply_chart_theme(fig3, theme), use_container_width=True)
 
-with col3:
-    st.subheader("👥 Segment Performance")
+# --- ROW 2: CHARTS & INSIGHTS ---
+c4, c5 = st.columns([2, 1])
+
+with c4:
     seg_data = segment_breakdown(filtered)
-    fig_bar = px.bar(seg_data, x="Segment", y="Sales", color="Segment")
-    fig_bar = apply_chart_theme(fig_bar, theme)
-    st.plotly_chart(fig_bar, use_container_width=True)
+    fig4 = px.bar(seg_data, x="Sales", y="Segment", orientation="h", title="👥 Sales by Segment", color="Segment")
+    fig4.update_layout(yaxis={'categoryorder':'total ascending'})
+    st.plotly_chart(apply_chart_theme(fig4, theme), use_container_width=True)
 
-with col4:
-    st.subheader("🚨 Profit Warnings")
+with c5:
+    st.markdown(f"<h4 style='color: var(--text-main); margin-bottom: 15px;'>💡 Auto Insights</h4>", unsafe_allow_html=True)
     insights = generate_insights(filtered)
-    for i in insights[:3]:  # Show top 3 insights
-        icon = i['icon']
-        text = i['text']
-        st.markdown(f'<div class="insight-box"><b>{icon} Insight</b><br>{text}</div>', unsafe_allow_html=True)
+    for i in insights[:3]: # Top 3 insights
+        st.markdown(f'<div class="insight"><div class="t">{i["icon"]} Insight</div><div class="b">{i["text"]}</div></div>', unsafe_allow_html=True)
