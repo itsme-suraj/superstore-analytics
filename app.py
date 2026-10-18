@@ -13,46 +13,69 @@ st.set_page_config(page_title="Superstore BI", page_icon="📊", layout="wide",
 # ───────────────────────── THEME ─────────────────────────
 DARK = st.session_state.get("dark", True)
 P = dict(
-    bg="#0d1117" if DARK else "#f4f6fb", card="#161b26" if DARK else "#ffffff",
-    bd="#262d3d" if DARK else "#e1e6f0", tx="#e8ecf5" if DARK else "#141a2b",
-    mu="#8b95b0" if DARK else "#5d6785", grid="rgba(255,255,255,.07)" if DARK else "rgba(20,26,43,.08)",
-    ac="#22d3ee" if DARK else "#0e7490", ac2="#f59e0b", good="#34d399" if DARK else "#059669", bad="#f87171" if DARK else "#dc2626",
+    bg="#0a0e1a" if DARK else "#e8eef8", card="#151b2e" if DARK else "#ffffff",
+    bd="#34405f" if DARK else "#b4c0da", tx="#f1f5ff" if DARK else "#0b1226",
+    mu="#aab5d6" if DARK else "#3b4766", grid="rgba(255,255,255,.13)" if DARK else "rgba(11,18,38,.15)",
+    ac="#22d3ee" if DARK else "#0369a1", ac2="#fbbf24" if DARK else "#ea580c",
+    good="#34d399" if DARK else "#047857", bad="#f87171" if DARK else "#b91c1c",
 )
-PAL = ["#22d3ee", "#f59e0b", "#a78bfa", "#34d399", "#f472b6", "#60a5fa", "#fb923c", "#facc15"] if DARK else \
-      ["#0e7490", "#d97706", "#7c3aed", "#059669", "#db2777", "#2563eb", "#ea580c", "#a16207"]
+PAL = ["#22d3ee", "#fbbf24", "#a78bfa", "#34d399", "#f472b6", "#60a5fa", "#fb923c", "#f87171"] if DARK else \
+      ["#0369a1", "#ea580c", "#7c3aed", "#047857", "#db2777", "#2563eb", "#ca8a04", "#be123c"]
+
+# tables follow Streamlit's own theme (config.toml); flip them when our toggle differs
+try:
+    NATIVE = st.context.theme.type or st.get_option("theme.base") or "dark"
+except Exception:
+    NATIVE = st.get_option("theme.base") or "dark"
+FLIP = "div[data-testid='stDataFrame']{filter:invert(1) hue-rotate(180deg)}" if NATIVE != ("dark" if DARK else "light") else ""
 
 st.markdown(f"""<style>
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 :root{{--bg:{P['bg']};--card:{P['card']};--bd:{P['bd']};--tx:{P['tx']};--mu:{P['mu']};--ac:{P['ac']};--good:{P['good']};--bad:{P['bad']};}}
+{FLIP}
 </style>""", unsafe_allow_html=True)
 st.markdown("""<style>
 html,body,.stApp{font-family:'Manrope',sans-serif;background:var(--bg)!important;color:var(--tx)}
-header,#MainMenu,footer,[data-testid="stSidebar"],[data-testid="collapsedControl"]{display:none!important}
-.block-container{max-width:100%!important;padding:.8rem 2rem 2rem!important}
-.stApp p,.stApp label,.stApp span,.stApp li,.stApp h1,.stApp h2,.stApp h3,.stApp h4{color:var(--tx)}
-[data-testid="stWidgetLabel"] p{color:var(--mu)!important;font-size:.78rem;font-weight:600}
-div[data-baseweb="select"]>div,div[data-baseweb="input"]>div,[data-testid="stDateInput"]>div>div{background:var(--card)!important;border:1px solid var(--bd)!important;border-radius:10px!important}
-div[data-baseweb="select"] input,div[data-baseweb="input"] input{color:var(--tx)!important}
+header,[data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stDecoration"],#MainMenu,footer,
+[data-testid="stSidebar"],[data-testid="collapsedControl"]{display:none!important}
+[data-testid="stMainBlockContainer"],.block-container{max-width:100%!important;padding:.3rem 1.2rem 1.5rem!important}
+[data-testid="stAppViewContainer"]>.main,section.main{padding-top:0!important}
+[data-testid="stVerticalBlock"]{gap:.7rem}
+.stApp,.stApp p,.stApp label,.stApp span,.stApp li,.stApp h1,.stApp h2,.stApp h3,.stApp h4{color:var(--tx)}
+[data-testid="stCaptionContainer"],[data-testid="stCaptionContainer"] p{color:var(--mu)!important}
+[data-testid="stWidgetLabel"] p{color:var(--tx)!important;font-size:.8rem;font-weight:700}
+[data-testid="stSlider"] div{color:var(--tx)!important}
+div[data-baseweb="select"]>div,div[data-baseweb="input"]>div{background:var(--card)!important;border:1.5px solid var(--bd)!important;border-radius:10px!important}
+div[data-baseweb="select"] *,div[data-baseweb="input"] input{color:var(--tx)!important}
+div[data-baseweb="select"] svg{fill:var(--tx)!important}
+input::placeholder{color:var(--mu)!important;opacity:1}
 span[data-baseweb="tag"]{background:var(--ac)!important}
-span[data-baseweb="tag"] span{color:#fff!important}
-ul[role="listbox"],div[data-baseweb="popover"]>div{background:var(--card)!important}
-li[role="option"]{color:var(--tx)!important}
-.topbar{display:flex;align-items:center;gap:14px;padding:6px 0 14px;border-bottom:1px solid var(--bd);margin-bottom:12px}
-.logo{width:40px;height:40px;border-radius:10px;background:var(--ac);display:grid;place-items:center;font-size:20px}
-.ttl{font-size:1.35rem;font-weight:800;line-height:1.1}.sub{font-size:.8rem;color:var(--mu)}
-.kpi{background:var(--card);border:1px solid var(--bd);border-top:3px solid var(--c);border-radius:12px;padding:14px 16px;height:100%}
-.kpi .l{font-size:.76rem;color:var(--mu);font-weight:600}
-.kpi .v{font-size:1.75rem;font-weight:800;margin:2px 0}
-.kpi .s{font-size:.78rem;color:var(--mu)}
-.ins{background:var(--card);border:1px solid var(--bd);border-left:4px solid var(--ac);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:.9rem;line-height:1.45}
-.sec{font-size:1.05rem;font-weight:800;margin:18px 0 6px}
-button[data-baseweb="tab"]{font-weight:700;font-size:.95rem;padding:10px 16px}
-button[data-baseweb="tab"] p{color:var(--mu)}
-button[data-baseweb="tab"][aria-selected="true"] p{color:var(--ac)}
-div[data-testid="stPlotlyChart"]{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:6px}
-.stButton>button,.stDownloadButton>button{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:10px;font-weight:700}
-.stButton>button:hover,.stDownloadButton>button:hover{border-color:var(--ac);color:var(--ac)}
-.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 22px;line-height:1.7}
+span[data-baseweb="tag"],span[data-baseweb="tag"] *{color:#fff!important}
+span[data-baseweb="tag"] svg{fill:#fff!important}
+div[data-baseweb="popover"],div[data-baseweb="popover"]>div,ul[role="listbox"],
+div[data-baseweb="calendar"],div[data-baseweb="calendar"] *{background-color:var(--card)!important;color:var(--tx)!important}
+li[role="option"]:hover,li[aria-selected="true"]{background-color:var(--bd)!important}
+div[data-baseweb="calendar"] [aria-selected="true"]{background-color:var(--ac)!important;color:#fff!important}
+.topbar{display:flex;align-items:center;gap:14px;padding:2px 0 10px;border-bottom:2px solid var(--bd);margin-bottom:8px}
+.logo{width:42px;height:42px;border-radius:11px;background:var(--ac);display:grid;place-items:center;font-size:21px}
+.ttl{font-size:1.5rem;font-weight:800;line-height:1.1;color:var(--tx)}.sub{font-size:.85rem;color:var(--mu);font-weight:500}
+.kpi{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 24%,var(--card)),var(--card) 70%);border:1.5px solid var(--bd);border-top:4px solid var(--c);border-radius:12px;padding:14px 16px;height:100%}
+.kpi .l{font-size:.78rem;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.kpi .v{font-size:1.85rem;font-weight:800;margin:2px 0;color:var(--tx)}
+.kpi .s{font-size:.8rem;color:var(--mu);font-weight:600}
+.ins{background:var(--card);border:1.5px solid var(--bd);border-left:5px solid var(--ac);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:.92rem;line-height:1.45;color:var(--tx)}
+.sec{font-size:1.1rem;font-weight:800;margin:16px 0 6px;color:var(--tx)}
+button[data-baseweb="tab"]{font-weight:800;font-size:1rem;padding:10px 18px}
+button[data-baseweb="tab"] p{color:var(--mu)!important}
+button[data-baseweb="tab"][aria-selected="true"] p{color:var(--ac)!important}
+div[data-baseweb="tab-highlight"]{background:var(--ac)!important;height:3px}
+div[data-baseweb="tab-border"]{background:var(--bd)!important}
+div[data-testid="stPlotlyChart"]{background:var(--card);border:1.5px solid var(--bd);border-radius:12px;padding:6px}
+.stButton>button,.stDownloadButton>button{background:var(--card);color:var(--tx);border:1.5px solid var(--bd);border-radius:10px;font-weight:700}
+.stButton>button:hover,.stDownloadButton>button:hover{border-color:var(--ac)}
+.stButton>button:hover p,.stDownloadButton>button:hover p{color:var(--ac)!important}
+.box{background:var(--card);border:1.5px solid var(--bd);border-radius:12px;padding:18px 22px;line-height:1.7;color:var(--tx)}
+.box code{background:var(--bd);color:var(--tx);padding:2px 6px;border-radius:5px}
 </style>""", unsafe_allow_html=True)
 
 US = {"Alabama": "AL", "Alaska": "AK", "Arizona": "AZ", "Arkansas": "AR", "California": "CA", "Colorado": "CO",
@@ -84,13 +107,15 @@ def show(obj, kind="chart", **kw):
 def sty(fig, h=430, title=None):
     fig.update_layout(
         height=h, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", colorway=PAL,
-        title=dict(text=title, x=0.01, font=dict(size=15)) if title else None,
-        font=dict(family="Manrope, sans-serif", color=P["tx"], size=12),
+        title=dict(text=title, x=0.01, font=dict(size=16, color=P["tx"])) if title else None,
+        font=dict(family="Manrope, sans-serif", color=P["tx"], size=13),
         margin=dict(l=10, r=10, t=52 if title else 12, b=10),
-        legend=dict(orientation="h", y=1.1, x=1, xanchor="right", title=None),
-        hoverlabel=dict(bgcolor=P["card"], font_color=P["tx"]))
-    fig.update_xaxes(gridcolor=P["grid"], zeroline=False, title=None)
-    fig.update_yaxes(gridcolor=P["grid"], zeroline=False, title=None)
+        legend=dict(orientation="h", y=1.1, x=1, xanchor="right", title=None, font=dict(color=P["tx"])),
+        coloraxis_colorbar=dict(tickfont=dict(color=P["tx"]), title=None),
+        hoverlabel=dict(bgcolor=P["card"], bordercolor=P["ac"], font=dict(color=P["tx"])))
+    ax = dict(gridcolor=P["grid"], zeroline=False, title=None, linecolor=P["bd"], tickfont=dict(color=P["tx"]))
+    fig.update_xaxes(**ax)
+    fig.update_yaxes(**ax)
     return fig
 
 
@@ -168,10 +193,10 @@ with h1:
                 '<div class="sub">Sales, profit, regions, products and shipping in one view</div></div></div>',
                 unsafe_allow_html=True)
 with h2:
-    st.write("")
+    st.markdown('<div style="height:10px"></div>', unsafe_allow_html=True)
     st.toggle("🌙 Dark mode", value=True, key="dark")
 with h3:
-    st.write("")
+    st.markdown('<div style="height:6px"></div>', unsafe_allow_html=True)
     st.button("↺ Reset filters", on_click=reset, key="rst")
 
 f1, f2, f3, f4, f5 = st.columns([2, 1.4, 1.4, 1.4, 1.4])
@@ -308,7 +333,7 @@ with tabs[3]:
     mt = st.radio("Map metric", ["Sales", "Profit"], horizontal=True, key="mapm")
     fig = px.choropleth(st_, locations="Code", locationmode="USA-states", color=mt, scope="usa", hover_name="State",
                         color_continuous_scale="Teal" if mt == "Sales" else "RdYlGn")
-    fig.update_geos(bgcolor="rgba(0,0,0,0)", lakecolor="rgba(0,0,0,0)")
+    fig.update_geos(bgcolor="rgba(0,0,0,0)", landcolor=P["card"], subunitcolor=P["bd"], showlakes=False)
     show(sty(fig, 560, f"{mt} by US state"))
     a, b = st.columns(2)
     rr = f.groupby("Region", as_index=False).agg(Sales=("Sales", "sum"), Profit=("Profit", "sum"))
