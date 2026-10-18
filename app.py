@@ -31,7 +31,7 @@ FLIP = "div[data-testid='stDataFrame']{filter:invert(1) hue-rotate(180deg)}" if 
 
 st.markdown(f"""<style>
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
-:root{{--bg:{P['bg']};--card:{P['card']};--bd:{P['bd']};--tx:{P['tx']};--mu:{P['mu']};--ac:{P['ac']};--good:{P['good']};--bad:{P['bad']};}}
+:root{{--bg:{P['bg']};--card:{P['card']};--bd:{P['bd']};--tx:{P['tx']};--mu:{P['mu']};--ac:{P['ac']};--good:{P['good']};--bad:{P['bad']};--fbg:{P['card'] if DARK else '#1e3a5f'};--ftx:{P['tx'] if DARK else '#ffffff'};--fph:{P['mu'] if DARK else '#d6e2f5'};--ftag:{P['ac'] if DARK else '#3b82f6'};}}
 {FLIP}
 </style>""", unsafe_allow_html=True)
 st.markdown("""<style>
@@ -46,12 +46,12 @@ header,[data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stDecora
 [data-testid="stWidgetLabel"] p{color:var(--tx)!important;font-size:.8rem;font-weight:700}
 [data-testid="stSlider"] div{color:var(--tx)!important}
 div[data-baseweb="select"] div,[data-testid="stDateInput"] input,[data-testid="stTextInput"] input{background-color:transparent!important}
-div[data-baseweb="select"]>div,div[data-baseweb="input"],div[data-baseweb="base-input"]{background-color:var(--card)!important}
+div[data-baseweb="select"]>div,div[data-baseweb="input"],div[data-baseweb="base-input"]{background-color:var(--fbg)!important}
 div[data-baseweb="select"]>div,div[data-baseweb="input"]{border:1.5px solid var(--bd)!important;border-radius:10px!important}
-div[data-baseweb="select"] *,div[data-baseweb="input"] *,[data-testid="stDateInput"] input{color:var(--tx)!important;-webkit-text-fill-color:var(--tx)!important}
-div[data-baseweb="select"] svg,div[data-baseweb="input"] svg{fill:var(--tx)!important}
-input::placeholder{color:var(--mu)!important;opacity:1;-webkit-text-fill-color:var(--mu)!important}
-span[data-baseweb="tag"]{background:var(--ac)!important}
+div[data-baseweb="select"] *,div[data-baseweb="input"] *,[data-testid="stDateInput"] input{color:var(--ftx)!important;-webkit-text-fill-color:var(--ftx)!important}
+div[data-baseweb="select"] svg,div[data-baseweb="input"] svg{fill:var(--ftx)!important}
+input::placeholder{color:var(--fph)!important;opacity:1;-webkit-text-fill-color:var(--fph)!important}
+span[data-baseweb="tag"]{background:var(--ftag)!important}
 span[data-baseweb="tag"],span[data-baseweb="tag"] *{color:#fff!important;-webkit-text-fill-color:#fff!important}
 span[data-baseweb="tag"] svg{fill:#fff!important}
 div[data-baseweb="popover"],div[data-baseweb="popover"]>div,ul[role="listbox"],
