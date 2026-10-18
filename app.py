@@ -45,12 +45,14 @@ header,[data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stDecora
 [data-testid="stCaptionContainer"],[data-testid="stCaptionContainer"] p{color:var(--mu)!important}
 [data-testid="stWidgetLabel"] p{color:var(--tx)!important;font-size:.8rem;font-weight:700}
 [data-testid="stSlider"] div{color:var(--tx)!important}
-div[data-baseweb="select"]>div,div[data-baseweb="input"]>div{background:var(--card)!important;border:1.5px solid var(--bd)!important;border-radius:10px!important}
-div[data-baseweb="select"] *,div[data-baseweb="input"] input{color:var(--tx)!important}
-div[data-baseweb="select"] svg{fill:var(--tx)!important}
-input::placeholder{color:var(--mu)!important;opacity:1}
+div[data-baseweb="select"] div,[data-testid="stDateInput"] input,[data-testid="stTextInput"] input{background-color:transparent!important}
+div[data-baseweb="select"]>div,div[data-baseweb="input"],div[data-baseweb="base-input"]{background-color:var(--card)!important}
+div[data-baseweb="select"]>div,div[data-baseweb="input"]{border:1.5px solid var(--bd)!important;border-radius:10px!important}
+div[data-baseweb="select"] *,div[data-baseweb="input"] *,[data-testid="stDateInput"] input{color:var(--tx)!important;-webkit-text-fill-color:var(--tx)!important}
+div[data-baseweb="select"] svg,div[data-baseweb="input"] svg{fill:var(--tx)!important}
+input::placeholder{color:var(--mu)!important;opacity:1;-webkit-text-fill-color:var(--mu)!important}
 span[data-baseweb="tag"]{background:var(--ac)!important}
-span[data-baseweb="tag"],span[data-baseweb="tag"] *{color:#fff!important}
+span[data-baseweb="tag"],span[data-baseweb="tag"] *{color:#fff!important;-webkit-text-fill-color:#fff!important}
 span[data-baseweb="tag"] svg{fill:#fff!important}
 div[data-baseweb="popover"],div[data-baseweb="popover"]>div,ul[role="listbox"],
 div[data-baseweb="calendar"],div[data-baseweb="calendar"] *{background-color:var(--card)!important;color:var(--tx)!important}
@@ -180,6 +182,10 @@ dmin, dmax = df["Order Date"].min().date(), df["Order Date"].max().date()
 FK = ["f_reg", "f_cat", "f_seg", "f_ship"]
 
 
+def flip():
+    st.session_state["dark"] = not st.session_state.get("dark", True)
+
+
 def reset():
     for k in FK:
         st.session_state[k] = []
@@ -193,8 +199,8 @@ with h1:
                 '<div class="sub">Sales, profit, regions, products and shipping in one view</div></div></div>',
                 unsafe_allow_html=True)
 with h2:
-    st.markdown('<div style="height:10px"></div>', unsafe_allow_html=True)
-    st.toggle("🌙 Dark mode", value=True, key="dark")
+    st.markdown('<div style="height:6px"></div>', unsafe_allow_html=True)
+    st.button("☀️ Light mode" if DARK else "🌙 Dark mode", on_click=flip, key="themebtn")
 with h3:
     st.markdown('<div style="height:6px"></div>', unsafe_allow_html=True)
     st.button("↺ Reset filters", on_click=reset, key="rst")
